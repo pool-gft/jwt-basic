@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.auth.service.UserService;
 
 @Component
@@ -31,15 +31,19 @@ public class JWTFilter extends OncePerRequestFilter {
 			throws IOException, ServletException {
 		String header = req.getHeader("Authorization");
 		if (header != null && !header.isBlank() && header.startsWith("Bearer ")) {
-			String jwt = extractJWT(header);
+			try {
 
-			String email = jwtHelper.validateTokenAndRetrieveEmail(jwt);
-			UserDetails userDetails = service.loadUserByUsername(email);
+				String jwt = extractJWT(header);
+				String email = jwtHelper.validateTokenAndRetrieveEmail(jwt);
+				UserDetails userDetails = service.loadUserByUsername(email);
 
-			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email,
-					userDetails.getPassword(), userDetails.getAuthorities());
-			if (SecurityContextHolder.getContext().getAuthentication() == null)
-				SecurityContextHolder.getContext().setAuthentication(authToken);
+				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email,
+						userDetails.getPassword(), userDetails.getAuthorities());
+				if (SecurityContextHolder.getContext().getAuthentication() == null)
+					SecurityContextHolder.getContext().setAuthentication(authToken);
+			} catch (JWTVerificationException ex) {
+				System.out.println(ex + "Good point to LOG");
+			}
 		}
 		filterChain.doFilter(req, res);
 	}
@@ -48,10 +52,10 @@ public class JWTFilter extends OncePerRequestFilter {
 		if (header != null && !header.isBlank() && header.startsWith("Bearer ")) {
 			String jwt = header.substring(7);
 			if (jwt == null || jwt.isBlank())
-				throw new JWTDecodeException("Blank token in header.");
+				throw new JWTVerificationException("Blank token in header.");
 			return jwt;
 		}
-		throw new JWTDecodeException("Invalid authorization header");
+		throw new JWTVerificationException("Invalid authorization header");
 	}
 
 }

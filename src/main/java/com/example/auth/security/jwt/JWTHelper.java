@@ -32,5 +32,4 @@ public class JWTHelper {
 		DecodedJWT jwt = verifier.verify(token);
 		return jwt.getClaim("email").asString();
 	}
-
 }

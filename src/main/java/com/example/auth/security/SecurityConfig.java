@@ -1,5 +1,7 @@
 package com.example.auth.security;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +26,9 @@ public class SecurityConfig {
 	private UserService service;
 	@Autowired
 	private JWTFilter filter;
+	// @Autowired
+	// @Qualifier("delegatedAuthenticationEntryPoint")
+	// AuthenticationEntryPoint delegatedAuthExceptionHandler;
 
 	@Bean
 	public SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -34,8 +39,10 @@ public class SecurityConfig {
 						.antMatchers("/auth/**").permitAll()
 						.antMatchers("/users/info").hasRole("USER"))
 				.userDetailsService(service)
-				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.exceptionHandling(handler -> handler.authenticationEntryPoint(
+						(req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.build();
 	}
 
@@ -50,3 +57,16 @@ public class SecurityConfig {
 	}
 
 }
+//
+// @Component("delegatedAuthenticationEntryPoint")
+// class DelegatedAuthneticationEntryPoint implements AuthenticationEntryPoint {
+// @Autowired
+// @Qualifier("handlerExceptionResolver")
+// private HandlerExceptionResolver resolver;
+//
+// public void commence(HttpServletRequest req, HttpServletResponse res,
+// AuthenticationException ex) {
+// resolver.resolveException(req, res, null, ex);
+// }
+//
+// }

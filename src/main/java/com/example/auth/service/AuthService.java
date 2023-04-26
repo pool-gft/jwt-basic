@@ -19,14 +19,11 @@ public class AuthService {
 	private UserRepo repository;
 	private PasswordEncoder passwordEncoder;
 	private JWTHelper jwtHelper;
-	// TODO que hacer con esto
-	// private AuthenticationManager authManager;
 
 	public AuthService(UserRepo repository, PasswordEncoder passwordEncoder, JWTHelper jwtHelper) {
 		this.repository = repository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtHelper = jwtHelper;
-		// this.authManager = authManager;
 	}
 
 	public Map<String, Object> registerUser(UserEntity user) {
