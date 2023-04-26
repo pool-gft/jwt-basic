@@ -28,7 +28,6 @@ public class AuthService {
 
 	public Map<String, Object> registerUser(UserEntity user) {
 		String encryptedPass = passwordEncoder.encode(user.getPassword());
-		System.out.println(encryptedPass);
 		user.setPassword(encryptedPass);
 		user = repository.save(user);
 		String token = jwtHelper.generateToken(user.getEmail());

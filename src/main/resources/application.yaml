@@ -8,4 +8,4 @@ spring:
     username: admin
     password: 1234
     driver-class-name: org.h2.Driver
-jwt-secret: asdf
+jwt-secret: this-should-be-random-and-longer
