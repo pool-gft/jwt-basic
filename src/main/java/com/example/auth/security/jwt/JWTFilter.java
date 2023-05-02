@@ -2,6 +2,7 @@ package com.example.auth.security.jwt;
 
 import java.io.IOException;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +42,7 @@ public class JWTFilter extends OncePerRequestFilter {
 						userDetails.getPassword(), userDetails.getAuthorities());
 				if (SecurityContextHolder.getContext().getAuthentication() == null)
 					SecurityContextHolder.getContext().setAuthentication(authToken);
-			} catch (JWTVerificationException ex) {
+			} catch (JWTVerificationException | EntityNotFoundException ex) {
 				System.out.println(ex + "Good point to LOG");
 			}
 		}
