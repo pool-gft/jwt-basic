@@ -37,6 +37,7 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(r -> r
 						.antMatchers("/auth/**").permitAll()
+						.antMatchers("/h2/**").permitAll()
 						.antMatchers("/users/info").hasRole("USER"))
 				.userDetailsService(service)
 				.exceptionHandling(handler -> handler.authenticationEntryPoint(

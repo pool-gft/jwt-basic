@@ -1,10 +1,9 @@
 package com.example.auth.service;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.Cookie;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,22 +25,30 @@ public class AuthService {
 		this.jwtHelper = jwtHelper;
 	}
 
-	public Map<String, Object> registerUser(UserEntity user) {
+	public Cookie registerUser(UserEntity user) {
 		String encryptedPass = passwordEncoder.encode(user.getPassword());
 		user.setPassword(encryptedPass);
 		user = repository.save(user);
 		String token = jwtHelper.generateToken(user.getEmail());
-		return Collections.singletonMap("jwt-token", token);
+		return createJWTCookie(token);
 	}
 
-	public Map<String, Object> loginUser(UserEntity user) {
+	public Cookie loginUser(UserEntity user) {
 		Optional<UserEntity> opt = repository.findByEmail(user.getEmail());
 		if (opt.isEmpty())
 			throw new EntityNotFoundException("User not found or invalid credentials.");
 		if (!passwordEncoder.matches(user.getPassword(), opt.get().getPassword()))
 			throw new EntityNotFoundException("User not found or invalid credentials.");
 		String token = jwtHelper.generateToken(user.getEmail());
-		return Collections.singletonMap("jwt-token", token);
+		return createJWTCookie(token);
+	}
+
+	// TODO: make this configurable
+	private Cookie createJWTCookie(String jwtToken) {
+		Cookie cookie = new Cookie("jwt", jwtToken);
+		cookie.setHttpOnly(true);
+		cookie.setPath("/users");
+		return cookie;
 	}
 
 }
