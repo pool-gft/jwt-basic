@@ -2,7 +2,6 @@ package com.example.auth.security;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,13 +21,13 @@ import com.example.auth.service.UserService;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Autowired
 	private UserService service;
-	@Autowired
 	private JWTFilter filter;
-	// @Autowired
-	// @Qualifier("delegatedAuthenticationEntryPoint")
-	// AuthenticationEntryPoint delegatedAuthExceptionHandler;
+
+	public SecurityConfig(UserService service, JWTFilter filter) {
+		this.service = service;
+		this.filter = filter;
+	}
 
 	@Bean
 	public SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -58,16 +57,3 @@ public class SecurityConfig {
 	}
 
 }
-//
-// @Component("delegatedAuthenticationEntryPoint")
-// class DelegatedAuthneticationEntryPoint implements AuthenticationEntryPoint {
-// @Autowired
-// @Qualifier("handlerExceptionResolver")
-// private HandlerExceptionResolver resolver;
-//
-// public void commence(HttpServletRequest req, HttpServletResponse res,
-// AuthenticationException ex) {
-// resolver.resolveException(req, res, null, ex);
-// }
-//
-// }
